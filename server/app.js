@@ -14,11 +14,12 @@ import { hashPassword, verifyPassword, digest, issueSession } from './security.j
 import { createWechat } from './wechat.js';
 import { surveySchema, validateAnswers } from './validation.js';
 import { exportWorkbook } from './export.js';
+import {normalizePublicOrigin,trustedAdminOrigin} from './origin.js';
 
 export async function createApp(config, adapters = {}) {
   const production = config.nodeEnv === 'production';
   if (production && config.enableDevLogin) throw new Error('生产环境禁止 ENABLE_DEV_LOGIN');
-  if (production && !/^https:\/\//.test(config.publicOrigin || '')) throw new Error('生产环境 PUBLIC_ORIGIN 必须为 HTTPS');
+  const publicOrigin=normalizePublicOrigin(config.publicOrigin,production);
   const db = await openStorage(config);
   if(!(await db.prepare('SELECT id FROM admins LIMIT 1').get())) {
     if(!config.adminPassword || config.adminPassword.length < 12) throw new Error('首次启动请设置至少 12 位 ADMIN_PASSWORD');
@@ -33,7 +34,7 @@ export async function createApp(config, adapters = {}) {
   app.use('/api',(_req,res,next)=>{res.set('Cache-Control','no-store');next();});
   app.use('/api',rateLimit({windowMs:60000,limit:300,standardHeaders:'draft-8',legacyHeaders:false,message:{error:'请求过于频繁，请稍后重试'}}));
   app.use('/api/admin',(req,res,next)=>{
-    if(!['GET','HEAD','OPTIONS'].includes(req.method) && req.headers.origin && req.headers.origin !== config.publicOrigin) return res.status(403).json({error:'请求来源不受信任'});
+    if(!['GET','HEAD','OPTIONS'].includes(req.method) && !trustedAdminOrigin(req,publicOrigin,production)) return res.status(403).json({error:'请求来源不受信任'});
     next();
   });
   const authLimiter = rateLimit({windowMs:15*60*1000,limit:20,standardHeaders:'draft-8',legacyHeaders:false,message:{error:'登录尝试过多，请 15 分钟后重试'}});
@@ -151,7 +152,7 @@ export async function createApp(config, adapters = {}) {
   app.use('/api/admin',auth('admin'));
   app.get('/api/admin/me',async (req,res)=>res.json({username:(await db.prepare('SELECT username FROM admins WHERE id=?').get(req.auth.user_id))?.username}));
   app.post('/api/admin/logout',async (req,res)=>{(await db.prepare('DELETE FROM sessions WHERE hash=?').run(req.auth.hash));res.clearCookie('admin_session',{path:'/api/admin',httpOnly:true,secure:production,sameSite:'strict'});res.json({ok:true});});
-  app.get('/api/admin/system',(_req,res)=>res.json({wechatReady:!!(config.wxAppId && config.wxAppSecret),production,devLogin:!!config.enableDevLogin,collectPhoneInSurvey:true,publicOrigin:config.publicOrigin,database:db.dialect || 'sqlite',avatarStorage:'database',cloudHosting:!!config.cloudHosting}));
+  app.get('/api/admin/system',(_req,res)=>res.json({wechatReady:!!(config.wxAppId && config.wxAppSecret),production,devLogin:!!config.enableDevLogin,collectPhoneInSurvey:true,publicOrigin,originMode:publicOrigin?'configured':'same-origin',database:db.dialect || 'sqlite',avatarStorage:'database',cloudHosting:!!config.cloudHosting}));
   app.get('/api/admin/surveys',async (_req,res)=>res.json((await db.prepare('SELECT s.*, (SELECT count(*) FROM responses r WHERE r.survey_id=s.id) AS response_count FROM surveys s ORDER BY s.updated_at DESC').all()).map(unpack)));
   app.post('/api/admin/surveys',async (req,res)=>{
     const s=surveySchema.parse(req.body),id=crypto.randomUUID(),now=new Date().toISOString();

@@ -10,7 +10,7 @@
 
 | 变量 | 填写内容 |
 |---|---|
-| `PUBLIC_ORIGIN` | 后台实际使用的完整 HTTPS 服务地址，不带结尾 `/` |
+| `PUBLIC_ORIGIN` | 可留空，自动匹配当前 HTTPS 访问域名；也可固定填写实际 HTTPS 服务地址 |
 | `ADMIN_USERNAME` | 管理员账号，默认 `admin` |
 | `ADMIN_PASSWORD` | 首次初始化管理员的独立随机密码，至少 12 位 |
 | `MYSQL_ADDRESS` | 沿用模板已注入的云 MySQL 地址，格式 `主机:端口` |
@@ -23,7 +23,7 @@
 Dockerfile 已设置 `NODE_ENV=production`、`HOST=0.0.0.0`、`PORT=80`、`DATABASE_DRIVER=mysql`、`CLOUD_HOSTING=true`、`TRUST_PROXY=1`、`ENABLE_DEV_LOGIN=false`。控制台如存在同名变量，请设置相同值。云模式禁止使用 SQLite 保存线上数据。
 
 - 首次启动创建业务表和初始问卷，不删除模板计数器表，不清空已有问卷、答卷或管理员。
-- `PUBLIC_ORIGIN` 和首次管理员密码缺失时拒绝启动并给出日志；数据库配置缺失或连接失败也会拒绝启动。
+- `PUBLIC_ORIGIN` 留空时生产服务可正常启动，后台写请求按当前 HTTPS 访问域名校验来源；显式填写 HTTP、路径或错误 URL 时仍拒绝启动。首次管理员密码缺失、数据库配置缺失或连接失败仍会拒绝启动。
 - AppID / AppSecret 尚未填写时可使用后台，真实微信登录返回明确的未配置错误。
 - 管理后台需要在控制台开启受支持的 HTTPS 公网访问方式。访问权限及小程序调用方按实际主体设置。
 - 部署后先检查 `/api/health` 返回 `{"ok":true}`，再访问 `/admin/` 登录。
