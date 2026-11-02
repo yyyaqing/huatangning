@@ -1,0 +1,17 @@
+<view wx:if="{{loading}}" class="loading">正在加载问卷…</view>
+<block wx:elif="{{survey}}">
+  <image wx:if="{{defaultTitle}}" class="brand-header" src="/assets/survey-header.png" mode="widthFix" aria-label="{{survey.title}}"/>
+  <view wx:else class="custom-header"><image src="/assets/brand-strip.png" mode="widthFix"/><view>{{survey.title}}</view></view>
+  <view class="survey-content">
+    <view wx:for="{{survey.questions}}" wx:for-item="q" wx:for-index="qi" wx:key="id" id="question-{{q.id}}" class="question">
+      <view class="question-title">{{qi+1}}. {{q.title}}<text wx:if="{{q.type==='multiple'}}" class="question-hint">（多选）</text><text wx:if="{{!q.required}}" class="question-hint">（选填）</text></view>
+      <radio-group wx:if="{{q.type==='single'}}" data-qid="{{q.id}}" bindchange="answer"><label wx:for="{{q.options}}" wx:for-item="o" wx:key="id" class="option {{selected[q.id+'_'+o.id]?'selected':''}}"><radio class="native-control" value="{{o.id}}" checked="{{selected[q.id+'_'+o.id]}}" color="#18898b"/><view class="radio-visual" aria-hidden="true"><view></view></view><view class="option-text">{{o.letter}}. {{o.text}}</view></label></radio-group>
+      <checkbox-group wx:elif="{{q.type==='multiple'}}" data-qid="{{q.id}}" bindchange="answer"><label wx:for="{{q.options}}" wx:for-item="o" wx:key="id" class="option {{selected[q.id+'_'+o.id]?'selected':''}}"><checkbox class="native-control" value="{{o.id}}" checked="{{selected[q.id+'_'+o.id]}}" color="#18898b"/><view class="radio-visual square" aria-hidden="true"><view></view></view><view class="option-text">{{o.letter}}. {{o.text}}</view></label></checkbox-group>
+      <view wx:elif="{{q.type==='phone'}}" class="phone-field"><input data-qid="{{q.id}}" type="number" maxlength="11" value="{{answers[q.id]}}" bindinput="answer" placeholder="请输入 11 位中国大陆手机号" aria-label="手机号，必填"/><view>必填 · 仅用于本次问卷参与记录</view></view>
+      <textarea wx:else data-qid="{{q.id}}" value="{{answers[q.id]}}" bindinput="answer" maxlength="2000" placeholder="请填写您的回答" aria-label="{{q.title}}" auto-height/>
+    </view>
+    <view wx:if="{{error}}" class="error" role="alert">{{error}}</view><button class="psd-button" bindtap="submit" disabled="{{busy}}" loading="{{busy}}" hover-class="pressed">{{busy?'提交中…':'提交'}}</button>
+    <view class="progress">已完成 {{progress}} / {{survey.questions.length}} 题 · 答案已自动暂存</view>
+  </view><image class="science-footer" src="/assets/survey-footer.jpg" mode="widthFix" aria-hidden="true"/><view class="safe-bottom"></view>
+</block>
+<view wx:else class="loading"><view class="error">{{error || '当前暂无开放问卷'}}</view><button class="psd-button" bindtap="retry">重新加载</button></view>

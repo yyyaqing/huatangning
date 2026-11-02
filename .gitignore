@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.env
+.local-start.txt
+data/
+uploads/
+test-results/
+playwright-report/
+releases/
+*.log
+*.psd
+*.sqlite*
+design/verification/
+miniprogram/project.private.config.json

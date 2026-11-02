@@ -1,0 +1,1 @@
+{"desc":"问卷需绑定微信后访问，不参与页面索引","rules":[{"action":"disallow","page":"*"}]}

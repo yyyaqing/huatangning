@@ -1,0 +1,10 @@
+import 'dotenv/config';
+import {openStorage} from '../server/storage.js';
+import {configFromEnv} from '../server/config.js';
+import {hashPassword} from '../server/security.js';
+const password=process.env.NEW_ADMIN_PASSWORD;
+if(!password || password.length<12)throw new Error('请通过 NEW_ADMIN_PASSWORD 环境变量提供至少 12 位新密码');
+const db=await openStorage(configFromEnv());
+const result=(await db.prepare('UPDATE admins SET password_hash=? WHERE username=?').run(hashPassword(password),process.env.ADMIN_USERNAME || 'admin'));
+if(!result.changes)throw new Error('管理员不存在');
+(await db.prepare("DELETE FROM sessions WHERE role='admin'").run());(await db.close());console.log('管理员密码已更新，现有管理员会话已失效。');

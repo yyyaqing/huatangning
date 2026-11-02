@@ -1,0 +1,43 @@
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 3000
+      CLOUD_HOSTING: "false"
+      DATABASE_DRIVER: sqlite
+      DATA_DIR: /app/data
+      UPLOAD_DIR: /app/uploads
+      TRUST_PROXY: 1
+      ENABLE_DEV_LOGIN: "false"
+    volumes:
+      - survey_data:/app/data
+      - survey_uploads:/app/uploads
+    expose:
+      - "3000"
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    environment:
+      APP_DOMAIN: ${APP_DOMAIN:?请在 .env 填写 APP_DOMAIN}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - app
+volumes:
+  survey_data:
+  survey_uploads:
+  caddy_data:
+  caddy_config:

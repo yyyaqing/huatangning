@@ -1,0 +1,8 @@
+{
+  "pages": ["pages/bind/index", "pages/survey/index", "pages/success/index", "pages/privacy/index"],
+  "window": {"navigationBarTitleText":"华堂宁问卷调查","navigationBarBackgroundColor":"#cde7ea","navigationBarTextStyle":"black","backgroundColor":"#cde7ea"},
+  "style":"v2",
+  "sitemapLocation":"sitemap.json",
+  "__usePrivacyCheck__":true,
+  "lazyCodeLoading":"requiredComponents"
+}

@@ -1,0 +1,13 @@
+node_modules
+dist
+.env
+.local-start.txt
+data
+uploads
+design
+*.psd
+test-results
+playwright-report
+.git
+releases
+tests

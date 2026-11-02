@@ -1,0 +1,16 @@
+<view class="dev-notice" wx:if="{{config.devLogin}}">本地体验环境 · 不获取真实微信身份</view>
+<image class="brand-header" src="/assets/survey-header.png" mode="widthFix" aria-label="华堂宁（多格列艾汀）知多少"/>
+<view class="bind-content">
+  <view class="shield" aria-hidden="true"><view>✓</view></view>
+  <view class="eyebrow">HUATANGNING SURVEY</view><view class="heading" role="heading">欢迎参与问卷调查</view>
+  <view class="intro">绑定微信后，即可开始填写。<view>感谢您分享宝贵的见解。</view></view>
+  <button class="avatar-picker" open-type="chooseAvatar" bindchooseavatar="chooseAvatar" hover-class="pressed" aria-label="选择头像，可选"><image wx:if="{{avatar}}" src="{{avatar}}"/><view wx:else class="avatar-placeholder">+</view><text>选择头像（可选）</text></button>
+  <label class="field-label">您的昵称<input type="nickname" maxlength="30" value="{{nickname}}" bindinput="nicknameInput" bindblur="nicknameInput" placeholder="请输入您的昵称" aria-label="您的昵称"/></label>
+  <checkbox-group bindchange="consentChanged"><label class="consent"><checkbox value="agree" checked="{{consent}}" color="#18898b"/><view>我已阅读并同意<text class="privacy-link" catchtap="privacy">《隐私说明》</text>，授权用于本次问卷。</view></label></checkbox-group>
+  <view wx:if="{{error}}" class="error" role="alert">{{error}}</view>
+  <button wx:if="{{needPrivacy}}" class="psd-button" bindtap="privacyPrompt" hover-class="pressed">阅读并授权隐私指引</button>
+  <button wx:else class="psd-button" bindtap="bind" loading="{{busy}}" disabled="{{busy || !config}}" hover-class="pressed">{{config.devLogin?'体验绑定并开始':'绑定微信并开始'}}</button>
+  <view class="note">{{config.devLogin?'本地模拟微信身份，仅用于验收。':'昵称头像由您主动提供；手机号在问卷中填写。'}}</view>
+</view>
+<image class="science-footer" src="/assets/survey-footer.jpg" mode="widthFix" aria-hidden="true"/>
+<view wx:if="{{showPrivacy}}" class="privacy-overlay"><view class="privacy-box" role="dialog"><view class="privacy-title">用户隐私保护指引</view><view class="privacy-text">参与问卷前，请阅读小程序用户隐私保护指引，了解信息收集与使用方式。</view><button class="contract-link" bindtap="openPrivacyContract">查看《用户隐私保护指引》</button><button id="agree-privacy" class="psd-button" open-type="agreePrivacyAuthorization" bindagreeprivacyauthorization="agreePrivacy" hover-class="pressed">同意并继续</button><button class="cancel" bindtap="closePrivacy">暂不参与</button></view></view>

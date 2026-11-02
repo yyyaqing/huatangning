@@ -1,0 +1,1 @@
+.privacy-content{padding:60rpx 46rpx 80rpx;color:var(--color-text)}.heading{font-size:38rpx;font-weight:700;line-height:1.5}.version{font-size:24rpx;opacity:.7;margin-top:20rpx}.section{font-size:28rpx;line-height:1.9;margin-top:44rpx}.section .title{font-weight:600;font-size:31rpx;margin-bottom:14rpx}.section>view{margin-bottom:16rpx}.psd-button{margin-top:50rpx;font-size:28rpx}

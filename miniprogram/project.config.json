@@ -1,0 +1,9 @@
+{
+  "description": "华堂宁问卷调查",
+  "miniprogramRoot": "./",
+  "compileType": "miniprogram",
+  "appid": "touristappid",
+  "projectname": "华堂宁问卷调查",
+  "setting": { "urlCheck": true, "es6": true, "enhance": true, "postcss": true, "minified": true, "minifyWXSS": true },
+  "libVersion": "3.7.0"
+}
